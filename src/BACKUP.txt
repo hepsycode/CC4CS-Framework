@@ -1,0 +1,6 @@
+--experimental-setup=BAMBU-AREA
+
+xc7a100t-1csg324-VVD (Artix-7)
+5SGXEA7N2F45C1 (Stratix-7)
+xc7z020-1clg484-VVD (Zynq-7000)
+xc7vx690t-3ffg1930-VVD (Virtex-7)

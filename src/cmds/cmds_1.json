@@ -1,0 +1,51 @@
+{	"Profiling": {
+		"additionalFile": "cp [scriptPath]/8051.h [prjPath]includes/",
+		"compiler": "gcc [functionPath] -fprofile-arcs -ftest-coverage -I[prjPath]includes/ -I/home/dews/Scrivania/bambu-hls/cc4cs_bambu/Microblaze_BSP/microblaze_0/include -I[prjPath]includes/[directoryName] -o [functionName]",
+		"exec": "[prjPath]files/[directoryName]/[functionName]",
+		"gcov": "gcov [functionName].gcda",
+		"dependencies": "additionalFile compiler exec gcov"
+	},
+
+	"Atmega328p": {
+		"mergeFiles" : "cat [functionName]Sim.txt [functionName]Moved {[functionName].txt}",
+		"moveString" : "sed /instructions:/{s///;s/^/instructions:/;} [functionName]Trace {[functionName]Moved}",
+		"stat" : "perf stat -e instructions: -o [functionName]Trace [prjPath]files/[directoryName]/[functionName] ",
+		"iss": "simulavr -f [functionName] -d atmega328 -T exit {[functionName]Sim.txt}",
+		"compiler": "avr-gcc [functionPath] -g -mmcu=atmega329 -I[prjPath]includes/[directoryName] -o [functionName]",
+		"size":"size [functionName] {[prjPath]files/[directoryName]/[directoryName].txt}",
+		"dependencies": "compiler size stat iss moveString mergeFiles"
+	},
+
+	"Leon3": {
+		"additionalFile": "cp [scriptPath]/tsim_cmd [prjPath]includes/",
+		"iss": "tsim-leon3 [functionName] -c [prjPath]includes/tsim_cmd {[functionName].txt}",
+		"compiler":"sparc-elf-gcc [functionPath] -o0 -I[prjPath]includes/[directoryName] -o [functionName]",
+		"size":"size [functionName] {[prjPath]files/[directoryName]/[directoryName].txt}",
+		"dependencies": "additionalFile compiler size iss"
+	},
+
+	"Microblaze": {
+		"compiler": "mb-gcc [functionPath] -I[prjPath]includes/ -I/home/dews/Scrivania/bambu-hls/cc4cs_bambu/src/Microblaze_BSP/microblaze_0/include -T /home/dews/Scrivania/Microblaze-CC4CS/sw/lscript.ld -L/home/dews/Scrivania/Microblaze-CC4CS/microblaze_0/lib -I[prjPath]includes/[directoryName] -mlittle-endian -mxl-barrel-shift -mxl-pattern-compare -mno-xl-soft-div -mcpu=v11.0 -mno-xl-soft-mul -o [functionName].elf -lxil -lgcc -lc",
+		"iss": "",
+		"dependencies": "compiler iss"
+	},
+
+	"8051": {
+		"compiler": "sdcc [functionPath] --stack-auto -mmcs51 --iram-size 128 -I[prjPath]includes/[directoryName]",
+		"iss": "isasim [functionName].hex {[functionName].txt}",
+		"packihx": "packihx [functionName].ihx {[functionName].hex}",
+		"dependencies" : "compiler packihx iss"	
+	},
+
+	"Bambu": {
+		"iss": "bambu [functionPath] -I[prjPath]includes/[directoryName] --simulate --simulator=VERILATOR --clock-period=5 --device-name=xc7a100t-1csg324-VVD {[prjPath]files/[directoryName]/[directoryName].txt}",
+		"dependencies" : "iss"	
+	},
+
+	"FramaC": {
+		"mccabe": "frama-c -metrics -metrics-value-cover -cpp-extra-args='-I[prjPath]includes/' -cpp-extra-args='-I[prjPath]includes/[directoryName]' [functionPath] {McCabe.txt}",
+		"halsted": "frama-c -metrics -metrics-ast cabs -cpp-extra-args='-I[prjPath]includes/' -cpp-extra-args='-I[prjPath]includes/[directoryName]' [functionPath] {Halsted.txt}",
+		"dependencies": "mccabe halsted"
+	}
+}
+
